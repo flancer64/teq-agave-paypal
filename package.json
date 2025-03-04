@@ -1,11 +1,11 @@
 {
-  "name": "@flancer64/teq-agave-plugin",
+  "name": "@flancer64/teq-agave-paypal",
   "version": "0.1.0",
   "type": "module",
-  "description": "...",
-  "homepage": "https://github.com/flancer64/teq-agave-plugin/",
+  "description": "A TeqFW plugin enabling PayPal integration for payment processing in web applications.",
+  "homepage": "https://github.com/flancer64/teq-agave-paypal/",
   "bugs": {
-    "url": "https://github.com/flancer64/teq-agave-plugin/issues",
+    "url": "https://github.com/flancer64/teq-agave-paypal/issues",
     "email": "alex@flancer64.com"
   },
   "license": "Apache-2.0",
@@ -14,16 +14,15 @@
     "email": "alex@flancer64.com",
     "url": "https://github.com/flancer64"
   },
-  "repository": "github:flancer64/teq-agave-plugin",
+  "repository": "github:flancer64/teq-agave-paypal",
   "scripts": {
     "test:accept": "mocha ./test/accept --recursive",
     "test:unit": "mocha ./test/unit --recursive"
   },
   "dependencies": {
     "@teqfw/core": ">=0.33.0 <1.0.0",
-    "@teqfw/db": ">=0.22.1 <1.0.0",
-    "@teqfw/web": ">=0.26.0 <1.0.0",
-    "pg": "^8.13.1"
+    "@teqfw/db": ">=0.23.2 <1.0.0",
+    "@teqfw/web": ">=0.27.0 <1.0.0"
   },
   "devDependencies": {
     "@teqfw/test": ">=0.20.1 <1.0.0",

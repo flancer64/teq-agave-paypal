@@ -1,18 +1,18 @@
 /**
  * Plugin constants (hardcoded configuration) for backend code.
  */
-export default class Vendor_Plugin_Back_Defaults {
+export default class Fl64_Paypal_Back_Defaults {
     NAME;
 
-    /** @type {Vendor_Plugin_Shared_Defaults} */
+    /** @type {Fl64_Paypal_Shared_Defaults} */
     SHARED;
 
     /**
-     * @param {Vendor_Plugin_Shared_Defaults} SHARED
+     * @param {Fl64_Paypal_Shared_Defaults} SHARED
      */
     constructor(
         {
-            Vendor_Plugin_Shared_Defaults$: SHARED
+            Fl64_Paypal_Shared_Defaults$: SHARED
         }
     ) {
         this.SHARED = SHARED;
