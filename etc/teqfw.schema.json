@@ -4,28 +4,19 @@
       "package": {
         "paypal": {
           "entity": {
-            "name": {
-              "comment": "Some entity",
+            "order": {
+              "comment": "Stores PayPal orders initiated by users.",
               "attr": {
-                "id": {"type": "id"},
-                "user_ref": {
-                  "type": "ref",
-                  "comment": "Reference to the user."
-                },
-                "code": {
-                  "type": "string",
-                  "comment": "Some code."
-                },
-                "date_created": {
-                  "type": "datetime",
-                  "comment": "Date and time when the record was generated.",
-                  "default": "current"
-                }
+                "id": {"type": "id", "comment": "Internal order ID."},
+                "user_ref": {"type": "ref", "comment": "Reference to the user who created the order."},
+                "paypal_order_id": {"type": "string", "comment": "Order ID from PayPal."},
+                "amount": {"type": "number", "comment": "Order total amount.", "options": {"precision": 10, "scale": 2}},
+                "currency": {"type": "string", "comment": "Currency code (e.g., USD, EUR).", "options": {"length": 3}},
+                "status": {"type": "string", "comment": "Current status of the order.", "options": {"length": 50}},
+                "date_created": {"type": "datetime", "comment": "Timestamp when order was created.", "default": "current"}
               },
               "index": {
-                "code": {
-                  "type": "unique", "attrs": ["code"]
-                }
+                "paypal_order_id": {"type": "unique", "attrs": ["paypal_order_id"]}
               },
               "relation": {
                 "user": {
@@ -33,6 +24,52 @@
                   "ref": {"path": "/user", "attrs": ["id"]},
                   "action": {"delete": "cascade", "update": "cascade"}
                 }
+              }
+            },
+            "payment": {
+              "comment": "Stores captured payments for PayPal orders.",
+              "attr": {
+                "id": {"type": "id", "comment": "Internal payment ID."},
+                "order_ref": {"type": "ref", "comment": "Reference to the PayPal order."},
+                "paypal_payment_id": {"type": "string", "comment": "Payment ID from PayPal."},
+                "amount": {
+                  "type": "number", "comment": "Captured payment amount.", "options": {"precision": 10, "scale": 2}
+                },
+                "currency": {"type": "string", "comment": "Currency code.", "options": {"length": 3}},
+                "status": {"type": "string", "comment": "Payment status.", "options": {"length": 50}},
+                "payer_id": {"type": "string", "comment": "Payer ID from PayPal."},
+                "date_captured": {
+                  "type": "datetime", "comment": "Timestamp when payment was captured.", "default": "current"
+                }
+              },
+              "index": {
+                "paypal_payment_id": {"type": "unique", "attrs": ["paypal_payment_id"]}
+              },
+              "relation": {
+                "order": {
+                  "attrs": ["order_ref"],
+                  "ref": {"path": "/fl64/paypal/order", "attrs": ["id"]},
+                  "action": {"delete": "cascade", "update": "cascade"}
+                }
+              }
+            },
+            "log": {
+              "comment": "Logs requests and responses from PayPal API.",
+              "attr": {
+                "id": {"type": "id", "comment": "Internal log entry ID."},
+                "request_type": {
+                  "type": "string", "comment": "Type of PayPal request (e.g., order_create, capture).",
+                  "options": {"length": 50}
+                },
+                "request_data": {"type": "json", "comment": "JSON payload of the request."},
+                "response_status": {"type": "integer", "comment": "HTTP status code of the response."},
+                "response_data": {"type": "json", "comment": "JSON payload of the response."},
+                "date_logged": {
+                  "type": "datetime", "comment": "Timestamp when log entry was recorded.", "default": "current"
+                }
+              },
+              "index": {
+                "request_type": {"type": "index", "attrs": ["request_type"]}
               }
             }
           }

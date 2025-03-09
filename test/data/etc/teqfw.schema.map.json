@@ -1,0 +1,12 @@
+{
+  "ref": {
+    "@flancer64/teq-agave-paypal": {
+      "/user": {
+        "path": "/test/user",
+        "attrs": {
+          "id": "id"
+        }
+      }
+    }
+  }
+}
