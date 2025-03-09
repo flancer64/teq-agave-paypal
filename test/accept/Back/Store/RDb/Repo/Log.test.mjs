@@ -1,6 +1,6 @@
 import assert from 'assert';
 import {createContainer} from '@teqfw/test';
-import {dbConnect, dbCreateFkEntities, dbDisconnect, dbReset, initConfig} from '../../../../common.mjs';
+import {dbConnect, dbDisconnect, dbReset, initConfig} from '../../../../common.mjs';
 
 // SETUP CONTAINER
 const container = await createContainer();
@@ -16,7 +16,7 @@ const REQUEST_TYPE = 'order_create';
 const REQUEST_DATA = JSON.stringify({action: 'create', details: {amount: 100}});
 const RESPONSE_STATUS = 200;
 const RESPONSE_DATA = JSON.stringify({status: 'SUCCESS', transaction_id: 'XYZ123'});
-const DATE_LOGGED = new Date();
+const DATE_NOW = new Date();
 let LOG_ID;
 
 // Test Suite for PayPal Log Repository
@@ -33,11 +33,12 @@ describe('Fl64_Paypal_Back_Store_RDb_Repo_Log', () => {
     it('should create a new log entry', async () => {
         /** @type {Fl64_Paypal_Back_Store_RDb_Schema_Log.Dto} */
         const dto = repoLog.createDto();
-        dto.request_type = REQUEST_TYPE;
+        dto.date_request = DATE_NOW;
+        dto.date_response = DATE_NOW;
         dto.request_data = REQUEST_DATA;
-        dto.response_status = RESPONSE_STATUS;
+        dto.request_type = REQUEST_TYPE;
         dto.response_data = RESPONSE_DATA;
-        dto.date_logged = DATE_LOGGED;
+        dto.response_status = RESPONSE_STATUS;
 
         const {primaryKey} = await repoLog.createOne({dto});
         LOG_ID = primaryKey[ATTR.ID];

@@ -1,12 +1,10 @@
 import {constants as H2} from 'node:http2';
 import {
     ApiError,
-    CheckoutPaymentIntent,
     Client,
     Environment,
     LogLevel,
     OrdersController,
-    PaymentsController,
 } from '@paypal/paypal-server-sdk';
 
 const {
@@ -26,12 +24,13 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
      * @param {TeqFw_Core_Back_Config} config
      * @param {TeqFw_Db_Back_App_TrxWrapper} trxWrapper - Database transaction wrapper
      * @param {TeqFw_Web_Back_Help_Respond} respond
-     * @param {Fl64_Tmpl_Back_Service_Render} tmplRender
-     * @param {Fl64_Tmpl_Back_Api_Adapter} adapterTmpl
-     * @param {Fl64_Otp_Back_Mod_Token} modToken - OTP token model to manage OTP tokens
+     * @param {Fl64_Web_Session_Back_Manager} session
      * @param {Fl64_Paypal_Back_Helper_Web} helpWeb
+     * @param {Fl64_Paypal_Back_Store_RDb_Repo_Log} repoLog
+     * @param {Fl64_Paypal_Back_Store_RDb_Repo_Order} repoOrder
      * @param {typeof Fl64_Paypal_Back_Enum_Mode} MODE
-     * @param {typeof Fl64_Tmpl_Back_Enum_Type} TMPL
+     * @param {typeof Fl64_Paypal_Back_Enum_Request_Type} REQUEST_TYPE
+     * @param {typeof Fl64_Paypal_Back_Enum_Order_Status} ORDER_STATUS
      */
     constructor(
         {
@@ -40,16 +39,19 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
             TeqFw_Core_Back_Config$: config,
             TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
             TeqFw_Web_Back_Help_Respond$: respond,
-            Fl64_Tmpl_Back_Service_Render$: tmplRender,
-            Fl64_Tmpl_Back_Api_Adapter$: adapterTmpl,
-            Fl64_Otp_Back_Mod_Token$: modToken,
+            Fl64_Web_Session_Back_Manager$: session,
             Fl64_Paypal_Back_Helper_Web$: helpWeb,
+            Fl64_Paypal_Back_Store_RDb_Repo_Log$: repoLog,
+            Fl64_Paypal_Back_Store_RDb_Repo_Order$: repoOrder,
             'Fl64_Paypal_Back_Enum_Mode.default': MODE,
-            'Fl64_Tmpl_Back_Enum_Type.default': TMPL,
+            'Fl64_Paypal_Back_Enum_Request_Type.default': REQUEST_TYPE,
+            'Fl64_Paypal_Back_Enum_Order_Status.default': ORDER_STATUS,
         }
     ) {
         // VARS
-        let client, ordersController, paymentsController;
+        const A_LOG = repoLog.getSchema().getAttributes();
+
+        let client, ordersController;
 
         // FUNCS
 
@@ -60,15 +62,9 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
                 const environment = (cfg.mode === MODE.PRODUCTION) ? Environment.Production : Environment.Sandbox;
                 client = new Client({
                     clientCredentialsAuthCredentials: {
-                        oAuthClientId: cfg.clientId,
-                        oAuthClientSecret: cfg.clientSecret,
-                    },
-                    timeout: 0,
-                    environment,
-                    logging: {
-                        logLevel: LogLevel.Info,
-                        logRequest: {logBody: true},
-                        logResponse: {logHeaders: true},
+                        oAuthClientId: cfg.clientId, oAuthClientSecret: cfg.clientSecret,
+                    }, timeout: 0, environment, logging: {
+                        logLevel: LogLevel.Info, logRequest: {logBody: true}, logResponse: {logHeaders: true},
                     },
                 });
             }
@@ -84,29 +80,36 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
             return ordersController;
         }
 
-        function getPaymentsController() {
-            if (!paymentsController) {
-                const client = getClient();
-                paymentsController = new PaymentsController(client);
-            }
-            return PaymentsController;
-        }
-
         /**
-         * Create an order to start the transaction.
+         * Create an order to start the payment transaction.
          * @see https://developer.paypal.com/docs/api/orders/v2/#orders_create
+         *
+         * @param {TeqFw_Db_Back_RDb_ITrans} trx
+         * @param {number} userRef
+         * @param {Object} purchaseUnits
          */
-        const createOrder = async (purchaseUnits) => {
+        async function createPaypalOrder(trx, userRef, purchaseUnits) {
             const collect = {
                 body: {
-                    intent: 'CAPTURE',
-                    purchaseUnits,
-                },
-                prefer: 'return=minimal',
+                    intent: 'CAPTURE', purchaseUnits,
+                }, prefer: 'return=minimal',
             };
-
             try {
+                // log data for paypal request
+                const logReq = repoLog.createDto();
+                logReq.request_data = JSON.stringify(collect);
+                logReq.request_type = REQUEST_TYPE.ORDER_CREATE;
+                logReq.date_request = new Date();
+                const {primaryKey} = await repoLog.createOne({trx, dto: logReq});
+                const logId = primaryKey[A_LOG.ID];
+                // perform paypal request
                 const {body, ...httpResponse} = await getOrdersController().ordersCreate(collect);
+                // log data for paypal response
+                const {record: logRes} = await repoLog.readOne({trx, key: logId});
+                logRes.date_response = new Date();
+                logRes.response_data = body;
+                logRes.response_status = httpResponse.statusCode;
+                await repoLog.updateOne({trx, updates: logRes});
                 // Get more response info...
                 // const { statusCode, headers } = httpResponse;
                 return {
@@ -120,8 +123,28 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
                     throw new Error(error.message);
                 }
             }
-        };
+        }
 
+        /**
+         *
+         * @param {TeqFw_Db_Back_RDb_ITrans} trx
+         * @param {number} userRef
+         * @param {number} amount
+         * @param {string} currency
+         * @param {Object} response
+         * @returns {Promise<void>}
+         */
+        async function saveOrder(trx, userRef, amount, currency, response) {
+            const dto = repoOrder.createDto();
+            dto.amount = amount;
+            dto.currency = currency;
+            dto.date_created = new Date();
+            dto.paypal_order_id = response.id;
+            dto.status = ORDER_STATUS.CREATED;
+            dto.user_ref = userRef;
+            const {primaryKey: id} = await repoOrder.createOne({trx, dto});
+            logger.info(`New PayPal order #${id} is created for user ${userRef}.`);
+        }
 
         // MAIN
         /**
@@ -133,20 +156,24 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
          * @return {Promise<void>}
          */
         this.run = async function (req, res) {
-            // FUNCS
-
-            // MAIN
             if (req.method === HTTP2_METHOD_POST) {
                 const {cart} = await helpWeb.parsePostedData(req);
-                const {jsonResponse, httpStatusCode} = await createOrder(cart);
-                debugger
-                respond.code200_Ok({
-                    res, body: jsonResponse, headers: {
-                        [HTTP2_HEADER_CONTENT_TYPE]: 'application/json'
-                    }
-                });
+                if (cart) {
+                    await trxWrapper.execute(null, async (trx) => {
+                        const {dto} = await session.getFromRequest({trx, req});
+                        // send request to PayPal to create order
+                        const {jsonResponse, httpStatusCode} = await createPaypalOrder(trx, dto.user_ref, cart);
+                        // save order data
+                        const {value, currencyCode} = cart[0].amount;
+                        await saveOrder(trx, dto.user_ref, value, currencyCode, jsonResponse);
+                        respond.code200_Ok({
+                            res, body: jsonResponse, headers: {
+                                [HTTP2_HEADER_CONTENT_TYPE]: 'application/json'
+                            }
+                        });
+                    });
+                }
             }
-
         };
     }
 }

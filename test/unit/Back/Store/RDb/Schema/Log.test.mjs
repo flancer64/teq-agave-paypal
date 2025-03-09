@@ -10,7 +10,8 @@ const schema = await container.get('Fl64_Paypal_Back_Store_RDb_Schema_Log$');
 describe('Fl64_Paypal_Back_Store_RDb_Schema_Log', () => {
     const ATTR = schema.getAttributes();
     const expectedProperties = [
-        'date_logged',
+        'date_request',
+        'date_response',
         'id',
         'request_data',
         'request_type',

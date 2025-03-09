@@ -111,7 +111,7 @@ export default class Fl64_Paypal_Back_Store_RDb_Repo_Order {
          *
          * @param {Object} params
          * @param {TeqFw_Db_Back_RDb_ITrans} [params.trx]
-         * @param {Object} params.key
+         * @param {Object} [params.key]
          * @param {Object} params.updates
          * @returns {Promise<{updatedCount: number}>}
          */

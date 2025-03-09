@@ -10,10 +10,14 @@
                 "id": {"type": "id", "comment": "Internal order ID."},
                 "user_ref": {"type": "ref", "comment": "Reference to the user who created the order."},
                 "paypal_order_id": {"type": "string", "comment": "Order ID from PayPal."},
-                "amount": {"type": "number", "comment": "Order total amount.", "options": {"precision": 10, "scale": 2}},
+                "amount": {
+                  "type": "number", "comment": "Order total amount.", "options": {"precision": 10, "scale": 2}
+                },
                 "currency": {"type": "string", "comment": "Currency code (e.g., USD, EUR).", "options": {"length": 3}},
                 "status": {"type": "string", "comment": "Current status of the order.", "options": {"length": 50}},
-                "date_created": {"type": "datetime", "comment": "Timestamp when order was created.", "default": "current"}
+                "date_created": {
+                  "type": "datetime", "comment": "Timestamp when order was created.", "default": "current"
+                }
               },
               "index": {
                 "paypal_order_id": {"type": "unique", "attrs": ["paypal_order_id"]}
@@ -58,14 +62,18 @@
               "attr": {
                 "id": {"type": "id", "comment": "Internal log entry ID."},
                 "request_type": {
-                  "type": "string", "comment": "Type of PayPal request (e.g., order_create, capture).",
-                  "options": {"length": 50}
+                  "type": "string", "comment": "Type of PayPal request (e.g., order_create, capture)."
                 },
                 "request_data": {"type": "json", "comment": "JSON payload of the request."},
-                "response_status": {"type": "integer", "comment": "HTTP status code of the response."},
-                "response_data": {"type": "json", "comment": "JSON payload of the response."},
-                "date_logged": {
+                "response_status": {
+                  "type": "integer", "comment": "HTTP status code of the response.", "nullable": true
+                },
+                "response_data": {"type": "json", "comment": "JSON payload of the response.", "nullable": true},
+                "date_request": {
                   "type": "datetime", "comment": "Timestamp when log entry was recorded.", "default": "current"
+                },
+                "date_response": {
+                  "type": "datetime", "comment": "Timestamp when response was received.", "nullable": true
                 }
               },
               "index": {

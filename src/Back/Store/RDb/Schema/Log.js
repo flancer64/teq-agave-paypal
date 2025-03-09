@@ -17,7 +17,8 @@ const ENTITY = '/fl64/paypal/log';
  * @memberOf Fl64_Paypal_Back_Store_RDb_Schema_Log
  */
 const ATTR = {
-    DATE_LOGGED: 'date_logged',
+    DATE_REQUEST: 'date_request',
+    DATE_RESPONSE: 'date_response',
     ID: 'id',
     REQUEST_DATA: 'request_data',
     REQUEST_TYPE: 'request_type',
@@ -38,7 +39,13 @@ class Dto {
      *
      * @type {Date}
      */
-    date_logged;
+    date_request;
+    /**
+     * Timestamp when response was received.
+     *
+     * @type {Date}
+     */
+    date_response;
 
     /**
      * Internal log entry ID.
@@ -86,11 +93,13 @@ export default class Fl64_Paypal_Back_Store_RDb_Schema_Log {
      *
      * @param {Fl64_Paypal_Back_Defaults} DEF
      * @param {TeqFw_Core_Shared_Util_Cast} cast
+     * @param {typeof Fl64_Paypal_Back_Enum_Request_Type} TYPE
      */
     constructor(
         {
             Fl64_Paypal_Back_Defaults$: DEF,
-            TeqFw_Core_Shared_Util_Cast$: cast
+            TeqFw_Core_Shared_Util_Cast$: cast,
+            'Fl64_Paypal_Back_Enum_Request_Type.default': TYPE,
         }
     ) {
         // INSTANCE METHODS
@@ -104,10 +113,11 @@ export default class Fl64_Paypal_Back_Store_RDb_Schema_Log {
         this.createDto = function (data) {
             const res = new Dto();
             if (data) {
-                res.date_logged = cast.date(data.date_logged);
+                res.date_request = cast.date(data.date_request);
+                res.date_response = cast.date(data.date_response);
                 res.id = cast.int(data.id);
                 res.request_data = cast.string(data.request_data);
-                res.request_type = cast.string(data.request_type);
+                res.request_type = cast.enum(data.request_type, TYPE, false);
                 res.response_data = cast.string(data.response_data);
                 res.response_status = cast.int(data.response_status);
             }
