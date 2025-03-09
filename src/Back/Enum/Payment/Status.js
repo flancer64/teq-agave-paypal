@@ -1,5 +1,3 @@
-import Fl64_Paypal_Back_Enum_Order_Status from '../Order/Status.js';
-
 /**
  * Enum for PayPal payment statuses.
  * Represents the possible statuses of a payment in PayPal.
