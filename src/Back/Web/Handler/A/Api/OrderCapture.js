@@ -1,11 +1,5 @@
 import {constants as H2} from 'node:http2';
-import {
-    ApiError,
-    Client,
-    Environment,
-    LogLevel,
-    OrdersController,
-} from '@paypal/paypal-server-sdk';
+import {ApiError} from '@paypal/paypal-server-sdk';
 
 const {
     HTTP2_HEADER_CONTENT_TYPE,
@@ -19,31 +13,27 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
     /**
      * Initializes the handler with required dependencies.
      *
-     * @param {Fl64_Paypal_Back_Defaults} DEF
      * @param {TeqFw_Core_Shared_Api_Logger} logger
-     * @param {TeqFw_Core_Back_Config} config
      * @param {TeqFw_Db_Back_App_TrxWrapper} trxWrapper
      * @param {TeqFw_Web_Back_Help_Respond} respond
      * @param {Fl64_Paypal_Back_Helper_Web} helpWeb
      * @param {Fl64_Paypal_Back_Store_RDb_Repo_Log} repoLog
      * @param {Fl64_Paypal_Back_Store_RDb_Repo_Order} repoOrder
      * @param {Fl64_Paypal_Back_Store_RDb_Repo_Payment} repoPayment
-     * @param {typeof Fl64_Paypal_Back_Enum_Mode} MODE
+     * @param {Fl64_Paypal_Back_Web_Handler_A_Api_Z_Client} zClient
      * @param {typeof Fl64_Paypal_Back_Enum_Request_Type} REQUEST_TYPE
      * @param {typeof Fl64_Paypal_Back_Enum_Order_Status} ORDER_STATUS
      */
     constructor(
         {
-            Fl64_Paypal_Back_Defaults$: DEF,
             TeqFw_Core_Shared_Api_Logger$$: logger,
-            TeqFw_Core_Back_Config$: config,
             TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
             TeqFw_Web_Back_Help_Respond$: respond,
             Fl64_Paypal_Back_Helper_Web$: helpWeb,
             Fl64_Paypal_Back_Store_RDb_Repo_Log$: repoLog,
             Fl64_Paypal_Back_Store_RDb_Repo_Order$: repoOrder,
             Fl64_Paypal_Back_Store_RDb_Repo_Payment$: repoPayment,
-            'Fl64_Paypal_Back_Enum_Mode.default': MODE,
+            Fl64_Paypal_Back_Web_Handler_A_Api_Z_Client$: zClient,
             'Fl64_Paypal_Back_Enum_Request_Type.default': REQUEST_TYPE,
             'Fl64_Paypal_Back_Enum_Order_Status.default': ORDER_STATUS,
         }
@@ -53,40 +43,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
         const A_ORDER = repoOrder.getSchema().getAttributes();
         const A_PAYMENT = repoPayment.getSchema().getAttributes();
 
-        let client, ordersController;
-
         // FUNCS
-
-        function getClient() {
-            if (!client) {
-                /** @type {Fl64_Paypal_Back_Plugin_Dto_Config_Local.Dto} */
-                const cfg = config.getLocal(DEF.NAME);
-                const environment = (cfg.mode === MODE.PRODUCTION) ? Environment.Production : Environment.Sandbox;
-                client = new Client({
-                    clientCredentialsAuthCredentials: {
-                        oAuthClientId: cfg.clientId,
-                        oAuthClientSecret: cfg.clientSecret,
-                    },
-                    timeout: 0,
-                    environment,
-                    logging: {
-                        logLevel: LogLevel.Info,
-                        logRequest: {logBody: true},
-                        logResponse: {logHeaders: true},
-                    },
-                });
-            }
-            return client;
-
-        }
-
-        function getOrdersController() {
-            if (!ordersController) {
-                const client = getClient();
-                ordersController = new OrdersController(client);
-            }
-            return ordersController;
-        }
 
         /**
          * Capture payment for the created order to complete the transaction.
@@ -109,7 +66,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
                 const {primaryKey} = await repoLog.createOne({trx, dto: logReq});
                 const logId = primaryKey[A_LOG.ID];
                 // perform paypal request
-                const {body, ...httpResponse} = await getOrdersController().ordersCapture(collect);
+                const {body, ...httpResponse} = await zClient.getOrdersController().ordersCapture(collect);
                 // log data for paypal response
                 const {record: logRes} = await repoLog.readOne({trx, key: logId});
                 logRes.date_response = new Date();
