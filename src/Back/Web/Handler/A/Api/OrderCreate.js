@@ -20,7 +20,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
      * @param {Fl64_Paypal_Back_Helper_Web} helpWeb
      * @param {Fl64_Paypal_Back_Store_RDb_Repo_Log} repoLog
      * @param {Fl64_Paypal_Back_Store_RDb_Repo_Order} repoOrder
-     * @param {Fl64_Paypal_Back_Web_Handler_A_Api_Z_Client} zClient
+     * @param {Fl64_Paypal_Back_Client} client
      * @param {typeof Fl64_Paypal_Back_Enum_Request_Type} REQUEST_TYPE
      * @param {typeof Fl64_Paypal_Back_Enum_Order_Status} ORDER_STATUS
      */
@@ -33,7 +33,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
             Fl64_Paypal_Back_Helper_Web$: helpWeb,
             Fl64_Paypal_Back_Store_RDb_Repo_Log$: repoLog,
             Fl64_Paypal_Back_Store_RDb_Repo_Order$: repoOrder,
-            Fl64_Paypal_Back_Web_Handler_A_Api_Z_Client$: zClient,
+            Fl64_Paypal_Back_Client$: client,
             'Fl64_Paypal_Back_Enum_Request_Type.default': REQUEST_TYPE,
             'Fl64_Paypal_Back_Enum_Order_Status.default': ORDER_STATUS,
         }
@@ -67,7 +67,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
                 const {primaryKey} = await repoLog.createOne({trx, dto: logReq});
                 const logId = primaryKey[A_LOG.ID];
                 // perform paypal request
-                const {body, ...httpResponse} = await zClient.getOrdersController().ordersCreate(collect);
+                const {body, ...httpResponse} = await client.getOrdersController().ordersCreate(collect);
                 // log data for paypal response
                 const {record: logRes} = await repoLog.readOne({trx, key: logId});
                 logRes.date_response = new Date();

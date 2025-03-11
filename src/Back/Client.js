@@ -8,7 +8,7 @@ import {
 /**
  * The client gets an app configuration and allows to use PayPal SDK.
  */
-export default class Fl64_Paypal_Back_Web_Handler_A_Api_Z_Client {
+export default class Fl64_Paypal_Back_Client {
     /**
      * Initializes the handler with required dependencies.
      *
@@ -24,6 +24,8 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_Z_Client {
         }
     ) {
         // VARS
+        /** @type {Fl64_Paypal_Back_Plugin_Dto_Config_Local.Dto} */
+        let cfg;
         let client, ordersController;
 
         // FUNCS
@@ -33,8 +35,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_Z_Client {
          */
         function getClient() {
             if (!client) {
-                /** @type {Fl64_Paypal_Back_Plugin_Dto_Config_Local.Dto} */
-                const cfg = config.getLocal(DEF.NAME);
+                cfg = config.getLocal(DEF.NAME);
                 const environment = (cfg.mode === MODE.PRODUCTION) ? Environment.Production : Environment.Sandbox;
                 client = new Client({
                     clientCredentialsAuthCredentials: {
@@ -55,6 +56,15 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_Z_Client {
         }
 
         // MAIN
+
+        /**
+         * Return the PayPal `clientId` from the local configuration.
+         * @returns {string}
+         */
+        this.getClientId = function () {
+            if (!client) getClient();
+            return cfg.clientId;
+        };
 
         this.getOrdersController = function () {
             if (!ordersController) {

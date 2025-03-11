@@ -35,7 +35,11 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
         const RES_CAPTURE = callOrderCapture.getResultCodes();
         const RES_CREATE = callOrderCreate.getResultCodes();
         let resultMessage = defaultResultMessage;
-        // @see `purchaseUnits` in https://developer.paypal.com/docs/api/orders/v2/#orders_create
+        /**
+         *
+         * @type {function(): Promise<[{description: string, amount: string, currency: string}]>}
+         * @see `purchaseUnits` in https://developer.paypal.com/docs/api/orders/v2/#orders_create
+         */
         let cartDataProvider = defaultCartDataProvider;
 
         // FUNCS
@@ -58,10 +62,10 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
                         ?.captures?.[0] ||
                     orderData?.purchase_units?.[0]?.payments
                         ?.authorizations?.[0];
-                resultMessage(
-                    `Transaction ${transaction.status}: ${transaction.id}<br>
+                resultMessage({
+                    message: `Transaction ${transaction.status}: ${transaction.id}<br>
           <br>See console for all available details`
-                );
+                });
                 console.log(
                     'Capture result',
                     orderData,
@@ -76,20 +80,19 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
         }
 
         // Example function to show a result to the user. Your site's UI library can be used instead.
-        function defaultResultMessage(message) {
+        function defaultResultMessage({message}) {
             const container = document.querySelector('#result-message');
             container.innerHTML = message;
         }
 
         /**
-         * @returns {Promise<Object[]>}
+         * @returns {Promise<[{description, amount: {value, currencyCode}}]>}
          * @see `purchaseUnits` in https://developer.paypal.com/docs/api/orders/v2/#orders_create
          */
         async function defaultCartDataProvider() {
             return [{
-                description: 'Test payment',
-                amount: '100',
-                currency: 'USD',
+                description: 'Test payment via @flancer64/teq-agave-paypal.',
+                amount: {value: '100', currency: 'USD'},
             }];
         }
 

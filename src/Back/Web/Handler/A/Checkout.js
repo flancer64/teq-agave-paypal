@@ -23,23 +23,19 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
      * Initializes the handler with required dependencies.
      *
      * @param {Fl64_Paypal_Back_Defaults} DEF
-     * @param {TeqFw_Core_Shared_Api_Logger} logger
-     * @param {TeqFw_Db_Back_App_TrxWrapper} trxWrapper - Database transaction wrapper
      * @param {TeqFw_Web_Back_Help_Respond} respond
      * @param {Fl64_Tmpl_Back_Service_Render} tmplRender
      * @param {Fl64_Tmpl_Back_Api_Adapter} adapterTmpl
-     * @param {Fl64_Otp_Back_Mod_Token} modToken - OTP token model to manage OTP tokens
+     * @param {Fl64_Paypal_Back_Client} client
      * @param {typeof Fl64_Tmpl_Back_Enum_Type} TMPL
      */
     constructor(
         {
             Fl64_Paypal_Back_Defaults$: DEF,
-            TeqFw_Core_Shared_Api_Logger$$: logger,
-            TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
             TeqFw_Web_Back_Help_Respond$: respond,
             Fl64_Tmpl_Back_Service_Render$: tmplRender,
             Fl64_Tmpl_Back_Api_Adapter$: adapterTmpl,
-            Fl64_Otp_Back_Mod_Token$: modToken,
+            Fl64_Paypal_Back_Client$: client,
             'Fl64_Tmpl_Back_Enum_Type.default': TMPL,
         }
     ) {
@@ -66,7 +62,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
                     type: TMPL.WEB,
                     name: 'checkout.html',
                     view: {
-                        clientId: 'AS8KI5uUSthf15WruAkgCWLKk8X_44KsbWYBcGY8F8GgDx2svqdYXmf-1-uSWFmzuxtVAznICXvRM6gX',
+                        clientId: client.getClientId(),
                     },
                     localeUser,
                     localeApp,
