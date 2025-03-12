@@ -36,7 +36,7 @@ export default class Fl64_Paypal_Back_Client {
         function getClient() {
             if (!client) {
                 cfg = config.getLocal(DEF.NAME);
-                const environment = (cfg.mode === MODE.PRODUCTION) ? Environment.Production : Environment.Sandbox;
+                const environment = (cfg?.mode?.toUpperCase() === MODE.PRODUCTION) ? Environment.Production : Environment.Sandbox;
                 client = new Client({
                     clientCredentialsAuthCredentials: {
                         oAuthClientId: cfg.clientId,
