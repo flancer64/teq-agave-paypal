@@ -3,13 +3,11 @@
  */
 export default class Fl64_Paypal_Front_Ui_Page_Checkout {
     /**
-     * @param {Fl64_Paypal_Front_Defaults} DEF
      * @param {Fl64_Paypal_Front_Call_Base_OrderCapture} callOrderCapture
      * @param {Fl64_Paypal_Front_Call_Base_OrderCreate} callOrderCreate
      */
     constructor(
         {
-            Fl64_Paypal_Front_Defaults$: DEF,
             Fl64_Paypal_Front_Call_Base_OrderCapture$: callOrderCapture,
             Fl64_Paypal_Front_Call_Base_OrderCreate$: callOrderCreate,
         }
@@ -36,16 +34,14 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
         const RES_CREATE = callOrderCreate.getResultCodes();
         let resultMessage = defaultResultMessage;
         /**
-         *
-         * @type {function(): Promise<[{description: string, amount: string, currency: string}]>}
-         * @see `purchaseUnits` in https://developer.paypal.com/docs/api/orders/v2/#orders_create
+         * @returns {Promise<CartData>}
          */
         let cartDataProvider = defaultCartDataProvider;
 
         // FUNCS
         async function createOrder() {
-            const cart = await cartDataProvider();
-            const {resultCode, orderId} = await callOrderCreate.perform({cart});
+            const {cart, discountCode} = await cartDataProvider();
+            const {resultCode, orderId} = await callOrderCreate.perform({cart, discountCode});
             if (resultCode === RES_CREATE.SUCCESS) return orderId;
             else throw new Error('Cannot create a new PayPal order on the backend.');
         }
@@ -86,14 +82,16 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
         }
 
         /**
-         * @returns {Promise<[{description, amount: {value, currencyCode}}]>}
-         * @see `purchaseUnits` in https://developer.paypal.com/docs/api/orders/v2/#orders_create
+         * Provides default cart data.
+         * @returns {Promise<CartData>} The default cart data.
          */
         async function defaultCartDataProvider() {
-            return [{
+            const discountCode = '';
+            const cart = [{
                 description: 'Test payment via @flancer64/teq-agave-paypal.',
                 amount: {value: '100', currency: 'USD'},
             }];
+            return {cart, discountCode};
         }
 
         // MAIN
@@ -128,3 +126,16 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
 
     }
 }
+
+/**
+ * @typedef {Object} CartItem
+ * @see `purchaseUnits` in https://developer.paypal.com/docs/api/orders/v2/#orders_create
+ * @property {string} description - Description of the cart item.
+ * @property {{value: string, currency: string}} amount - Amount details.
+ */
+
+/**
+ * @typedef {Object} CartData
+ * @property {CartItem[]} cart - List of items in the cart.
+ * @property {string} discountCode - Applied discount code.
+ */

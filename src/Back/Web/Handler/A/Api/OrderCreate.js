@@ -144,8 +144,10 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
          */
         this.run = async function (req, res) {
             if (req.method === HTTP2_METHOD_POST) {
-                const {cart} = await helpWeb.parsePostedData(req);
+                const {cart, discountCode} = await helpWeb.parsePostedData(req);
                 if (cart) {
+                    if (discountCode)
+                        logger.info(`Discount code '${discountCode}' is applied.`);
                     // there are 3 DB transactions here: session, PayPal logs in `createPaypalOrder`, `saveOrder`.
                     const {dto} = await session.getFromRequest({req});
                     // send request to PayPal to create order

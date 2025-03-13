@@ -39,7 +39,7 @@ export default class Fl64_Paypal_Front_Call_Base_OrderCreate {
          * @see `purchaseUnits` in https://developer.paypal.com/docs/api/orders/v2/#orders_create
          * @returns {Promise<{resultCode: string, orderId:string}>}
          */
-        this.perform = async function ({cart}) {
+        this.perform = async function ({cart, discountCode}) {
             // VARS
             let resultCode = RESULT.UNKNOWN_ERROR, orderId;
 
@@ -52,7 +52,7 @@ export default class Fl64_Paypal_Front_Call_Base_OrderCreate {
                     },
                     // use the "body" param to optionally pass additional order information
                     // like product ids and quantities
-                    body: JSON.stringify({cart}),
+                    body: JSON.stringify({cart, discountCode}),
                 });
 
                 const orderData = await response.json();
