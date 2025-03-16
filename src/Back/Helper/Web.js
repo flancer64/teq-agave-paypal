@@ -1,23 +1,21 @@
-// IMPORT
-import {constants as H2} from 'node:http2';
-import {URLSearchParams} from 'node:url';
-
-// VARS
-const {
-    HTTP2_HEADER_CONTENT_TYPE,
-} = H2;
-
 export default class Fl64_Paypal_Back_Helper_Web {
     /**
+     * @param {typeof import('node:http2')} http2
+     * @param {typeof import('node:url')} url
      * @param {Fl64_Paypal_Back_Defaults} DEF
      */
     constructor(
         {
+            'node:http2': http2,
+            'node:url': url,
             Fl64_Paypal_Back_Defaults$: DEF,
         }
     ) {
         // VARS
-        // FUNCS
+        const {
+            HTTP2_HEADER_CONTENT_TYPE,
+        } = http2.constants;
+
         // MAIN
 
         /**
@@ -63,7 +61,7 @@ export default class Fl64_Paypal_Back_Helper_Web {
                 if (contentType.includes('application/json')) {
                     body = JSON.parse(rawBody);
                 } else if (contentType.includes('application/x-www-form-urlencoded')) {
-                    body = Object.fromEntries(new URLSearchParams(rawBody));
+                    body = Object.fromEntries(new url.URLSearchParams(rawBody));
                 }
             }
             return body;

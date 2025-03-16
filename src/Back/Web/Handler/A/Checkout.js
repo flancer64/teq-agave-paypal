@@ -1,20 +1,3 @@
-import {constants as H2} from 'node:http2';
-
-const {
-    HTTP2_HEADER_CONTENT_TYPE,
-    HTTP2_METHOD_GET,
-} = H2;
-
-
-/**
- * @typedef {Object} AuthorizeRequestParams
- * @property {string} clientId - The unique identifier of the OAuth client.
- * @property {string} redirectUri - The URI where the user should be redirected after authorization.
- * @property {string} responseType - The type of response expected by the client (e.g., "code").
- * @property {string} scope - The scope of the requested permissions.
- * @property {string} state - A random string used to prevent CSRF attacks.
- */
-
 /**
  * Dispatcher for handling HTTP requests.
  */
@@ -22,6 +5,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
     /**
      * Initializes the handler with required dependencies.
      *
+     * @param {typeof import('node:http2')} http2
      * @param {Fl64_Paypal_Back_Defaults} DEF
      * @param {TeqFw_Web_Back_Help_Respond} respond
      * @param {Fl64_Tmpl_Back_Service_Render} tmplRender
@@ -31,6 +15,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
      */
     constructor(
         {
+            'node:http2': http2,
             Fl64_Paypal_Back_Defaults$: DEF,
             TeqFw_Web_Back_Help_Respond$: respond,
             Fl64_Tmpl_Back_Service_Render$: tmplRender,
@@ -40,7 +25,10 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
         }
     ) {
         // VARS
-
+        const {
+            HTTP2_HEADER_CONTENT_TYPE,
+            HTTP2_METHOD_GET,
+        } = http2.constants;
 
         // MAIN
         /**
@@ -79,3 +67,12 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
         };
     }
 }
+
+/**
+ * @typedef {Object} AuthorizeRequestParams
+ * @property {string} clientId - The unique identifier of the OAuth client.
+ * @property {string} redirectUri - The URI where the user should be redirected after authorization.
+ * @property {string} responseType - The type of response expected by the client (e.g., "code").
+ * @property {string} scope - The scope of the requested permissions.
+ * @property {string} state - A random string used to prevent CSRF attacks.
+ */

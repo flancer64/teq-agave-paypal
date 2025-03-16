@@ -1,12 +1,3 @@
-import {constants as H2} from 'node:http2';
-import {ApiError} from '@paypal/paypal-server-sdk';
-
-const {
-    HTTP2_HEADER_CONTENT_TYPE,
-    HTTP2_METHOD_POST,
-    HTTP_STATUS_INTERNAL_SERVER_ERROR,
-} = H2;
-
 /**
  * Handles PayPal order creation requests within a web application.
  *
@@ -17,6 +8,8 @@ const {
  */
 export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
     /**
+     * @param {typeof import('node:http2')} http2
+     * @param {typeof import('@paypal/paypal-server-sdk')} paypal
      * @param {TeqFw_Core_Shared_Api_Logger} logger
      * @param {TeqFw_Web_Back_Help_Respond} respond
      * @param {Fl64_Web_Session_Back_Manager} session
@@ -29,6 +22,8 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
      */
     constructor(
         {
+            'node:http2': http2,
+            'node:@paypal/paypal-server-sdk': paypal,
             TeqFw_Core_Shared_Api_Logger$$: logger,
             TeqFw_Web_Back_Help_Respond$: respond,
             Fl64_Web_Session_Back_Manager$: session,
@@ -41,6 +36,13 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCreate {
         }
     ) {
         // VARS
+        const {
+            HTTP2_HEADER_CONTENT_TYPE,
+            HTTP2_METHOD_POST,
+            HTTP_STATUS_INTERNAL_SERVER_ERROR,
+        } = http2.constants;
+        const {ApiError} = paypal;
+
         const A_ORDER = repoOrder.getSchema().getAttributes();
 
         // FUNCS

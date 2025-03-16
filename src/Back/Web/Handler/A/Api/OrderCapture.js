@@ -1,12 +1,3 @@
-import {constants as H2} from 'node:http2';
-import {ApiError} from '@paypal/paypal-server-sdk';
-
-const {
-    HTTP2_HEADER_CONTENT_TYPE,
-    HTTP2_METHOD_POST,
-    HTTP_STATUS_INTERNAL_SERVER_ERROR,
-} = H2;
-
 /**
  * Handles PayPal order capture requests within a web application.
  *
@@ -18,6 +9,8 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
     /**
      * Initializes the handler with required dependencies.
      *
+     * @param {typeof import('node:http2')} http2
+     * @param {typeof import('@paypal/paypal-server-sdk')} paypal
      * @param {TeqFw_Core_Shared_Api_Logger} logger
      * @param {TeqFw_Db_Back_App_TrxWrapper} trxWrapper
      * @param {TeqFw_Web_Back_Help_Respond} respond
@@ -31,6 +24,8 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
      */
     constructor(
         {
+            'node:http2': http2,
+            'node:@paypal/paypal-server-sdk': paypal,
             TeqFw_Core_Shared_Api_Logger$$: logger,
             TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
             TeqFw_Web_Back_Help_Respond$: respond,
@@ -44,6 +39,13 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
         }
     ) {
         // VARS
+        const {
+            HTTP2_HEADER_CONTENT_TYPE,
+            HTTP2_METHOD_POST,
+            HTTP_STATUS_INTERNAL_SERVER_ERROR,
+        } = http2.constants;
+        const {ApiError} = paypal;
+
         const A_ORDER = repoOrder.getSchema().getAttributes();
         const A_PAYMENT = repoPayment.getSchema().getAttributes();
 

@@ -1,10 +1,3 @@
-import {
-    Client,
-    Environment,
-    LogLevel,
-    OrdersController,
-} from '@paypal/paypal-server-sdk';
-
 /**
  * The client gets an app configuration and allows to use PayPal SDK.
  */
@@ -12,18 +5,22 @@ export default class Fl64_Paypal_Back_Client {
     /**
      * Initializes the handler with required dependencies.
      *
+     * @param {typeof import('@paypal/paypal-server-sdk')} paypal
      * @param {Fl64_Paypal_Back_Defaults} DEF
      * @param {TeqFw_Core_Back_Config} config
      * @param {typeof Fl64_Paypal_Back_Enum_Mode} MODE
      */
     constructor(
         {
+            'node:@paypal/paypal-server-sdk': paypal,
             Fl64_Paypal_Back_Defaults$: DEF,
             TeqFw_Core_Back_Config$: config,
             'Fl64_Paypal_Back_Enum_Mode.default': MODE,
         }
     ) {
         // VARS
+        const {Client, Environment, LogLevel, OrdersController} = paypal;
+
         /** @type {Fl64_Paypal_Back_Plugin_Dto_Config_Local.Dto} */
         let cfg;
         let client, ordersController;
