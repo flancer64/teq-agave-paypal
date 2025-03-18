@@ -71,7 +71,7 @@ export default class Fl64_Paypal_Back_Store_RDb_Repo_Payment {
          *
          * @param {Object} params
          * @param {TeqFw_Db_Back_RDb_ITrans} [params.trx]
-         * @param {Object} params.conditions
+         * @param {Object} [params.conditions]
          * @param {Object<string, 'asc'|'desc'>} [params.sorting]
          * @param {{limit: number, offset: number}} [params.pagination]
          * @returns {Promise<{records: Array<Fl64_Paypal_Back_Store_RDb_Schema_Payment.Dto>}>}

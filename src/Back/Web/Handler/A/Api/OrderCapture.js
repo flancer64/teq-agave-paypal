@@ -19,6 +19,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
      * @param {Fl64_Paypal_Back_Store_RDb_Repo_Order} repoOrder
      * @param {Fl64_Paypal_Back_Store_RDb_Repo_Payment} repoPayment
      * @param {Fl64_Paypal_Back_Client} client
+     * @param {Fl64_Paypal_Back_Api_Adapter} adapter
      * @param {typeof Fl64_Paypal_Back_Enum_Request_Type} REQUEST_TYPE
      * @param {typeof Fl64_Paypal_Back_Enum_Order_Status} ORDER_STATUS
      */
@@ -34,6 +35,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
             Fl64_Paypal_Back_Store_RDb_Repo_Order$: repoOrder,
             Fl64_Paypal_Back_Store_RDb_Repo_Payment$: repoPayment,
             Fl64_Paypal_Back_Client$: client,
+            Fl64_Paypal_Back_Api_Adapter$: adapter,
             'Fl64_Paypal_Back_Enum_Request_Type.default': REQUEST_TYPE,
             'Fl64_Paypal_Back_Enum_Order_Status.default': ORDER_STATUS,
         }
@@ -110,14 +112,26 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
          * Updates order status and saves captured payments in the database.
          *
          * @async
-         * @param {string} orderId - The PayPal order ID.
+         * @param {string} paypalOrderId - The PayPal order ID.
          * @param {Object} jsonResponse - The PayPal API response containing order capture details.
          * @throws {Error} If a database operation fails.
          * @returns {Promise<void>}
          */
-        async function savePayments(orderId, jsonResponse) {
+        async function savePayments(paypalOrderId, jsonResponse) {
+            // FUNCS
+            /**
+             * Use adapter to execute application-level business logic.
+             * @param {number} orderId internal order id
+             */
+            function onCommit({orderId}) {
+                adapter
+                    .processSuccessfulPayment({orderId, paypalResponse: jsonResponse})
+                    .catch(logger.exception);
+            }
+
+            // MAIN
             await trxWrapper.execute(null, async (trx) => {
-                const key = {[A_ORDER.PAYPAL_ORDER_ID]: orderId};
+                const key = {[A_ORDER.PAYPAL_ORDER_ID]: paypalOrderId};
                 const {record: foundOrder} = await repoOrder.readOne({trx, key});
                 foundOrder.status = ORDER_STATUS.COMPLETED;
                 await repoOrder.updateOne({trx, updates: foundOrder});
@@ -143,7 +157,8 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
                     const id = primaryKey[A_PAYMENT.ID];
                     logger.info(`New payment #${id} is created for order #${foundOrder.id}.`);
                 }
-            });
+                return {orderId: foundOrder.id};
+            }, onCommit);
         }
 
         // MAIN
