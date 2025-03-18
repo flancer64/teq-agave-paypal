@@ -22,7 +22,7 @@
   "dependencies": {
     "@flancer64/teq-agave-web-session": "git+ssh://git@github.com:flancer64/teq-agave-web-session.git",
     "@paypal/paypal-server-sdk": "^0.6.1",
-    "@teqfw/core": ">=0.33.0 <1.0.0",
+    "@teqfw/core": ">=0.34.0 <1.0.0",
     "@teqfw/db": ">=0.23.2 <1.0.0",
     "@teqfw/web": ">=0.27.1 <1.0.0"
   },
