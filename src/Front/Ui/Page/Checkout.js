@@ -39,7 +39,7 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
         let cartDataProvider = defaultCartDataProvider;
 
         // FUNCS
-        async function createOrder() {
+        async function createOrder(data, actions) {
             const {cart, discountCode} = await cartDataProvider();
             const {resultCode, orderId} = await callOrderCreate.perform({cart, discountCode});
             if (resultCode === RES_CREATE.SUCCESS) return orderId;
@@ -98,15 +98,20 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
 
         /**
          * Renders PayPal buttons in the specified container.
-         * @param {Object} params
+         * @param {object} params
          * @param {string} params.cssContainer - The CSS selector for the container where the PayPal button will be rendered.
+         * @param {object} [params.buttons] - Optional configuration for the PayPal Buttons instance, such as actions, styles, or events.
          */
-        this.renderButtons = function ({cssContainer}) {
+        this.renderButtons = function ({cssContainer, buttons}) {
             if (!window?.paypal?.Buttons) {
                 console.error('PayPal Buttons SDK is not available.');
             } else {
+                const opts = buttons ?? BUTTONS;
+                if (!opts.createOrder) opts.createOrder = createOrder;
+                if (!opts.onApprove) opts.onApprove = onApprove;
+                debugger
                 window.paypal
-                    .Buttons(BUTTONS)
+                    .Buttons(opts)
                     .render(cssContainer);
             }
         };
@@ -137,5 +142,5 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
 /**
  * @typedef {Object} CartData
  * @property {CartItem[]} cart - List of items in the cart.
- * @property {string} discountCode - Applied discount code.
+ * @property {string} [discountCode] - Applied discount code.
  */
