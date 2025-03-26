@@ -36,8 +36,8 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
             Fl64_Paypal_Back_Store_RDb_Repo_Payment$: repoPayment,
             Fl64_Paypal_Back_Client$: client,
             Fl64_Paypal_Back_Api_Adapter$: adapter,
-            'Fl64_Paypal_Back_Enum_Request_Type.default': REQUEST_TYPE,
-            'Fl64_Paypal_Back_Enum_Order_Status.default': ORDER_STATUS,
+            Fl64_Paypal_Back_Enum_Request_Type$: REQUEST_TYPE,
+            Fl64_Paypal_Back_Enum_Order_Status$: ORDER_STATUS,
         }
     ) {
         // VARS

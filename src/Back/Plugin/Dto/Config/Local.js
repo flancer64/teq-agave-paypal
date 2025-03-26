@@ -35,7 +35,7 @@ export default class Fl64_Paypal_Back_Plugin_Dto_Config_Local {
     constructor(
         {
             TeqFw_Core_Shared_Util_Cast$: cast,
-            'Fl64_Paypal_Back_Enum_Mode.default': MODE,
+            Fl64_Paypal_Back_Enum_Mode$: MODE,
         }
     ) {
         this.create = function (data) {

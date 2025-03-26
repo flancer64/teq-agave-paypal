@@ -100,7 +100,7 @@ export default class Fl64_Paypal_Back_Store_RDb_Schema_Order {
     constructor(
         {
             Fl64_Paypal_Back_Defaults$: DEF,
-            'Fl64_Paypal_Back_Enum_Order_Status.default': ORDER_STATUS,
+            Fl64_Paypal_Back_Enum_Order_Status$: ORDER_STATUS,
             TeqFw_Core_Shared_Util_Cast$: cast
         }
     ) {

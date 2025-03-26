@@ -21,7 +21,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
             Fl64_Tmpl_Back_Service_Render$: tmplRender,
             Fl64_Tmpl_Back_Api_Adapter$: adapterTmpl,
             Fl64_Paypal_Back_Client$: client,
-            'Fl64_Tmpl_Back_Enum_Type.default': TMPL,
+            Fl64_Tmpl_Back_Enum_Type$: TMPL,
         }
     ) {
         // VARS

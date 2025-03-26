@@ -108,7 +108,7 @@ export default class Fl64_Paypal_Back_Store_RDb_Schema_Payment {
     constructor(
         {
             Fl64_Paypal_Back_Defaults$: DEF,
-            'Fl64_Paypal_Back_Enum_Payment_Status.default': PAYMENT_STATUS,
+            Fl64_Paypal_Back_Enum_Payment_Status$: PAYMENT_STATUS,
             TeqFw_Core_Shared_Util_Cast$: cast
         }
     ) {

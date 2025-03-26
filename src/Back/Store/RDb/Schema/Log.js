@@ -99,7 +99,7 @@ export default class Fl64_Paypal_Back_Store_RDb_Schema_Log {
         {
             Fl64_Paypal_Back_Defaults$: DEF,
             TeqFw_Core_Shared_Util_Cast$: cast,
-            'Fl64_Paypal_Back_Enum_Request_Type.default': TYPE,
+            Fl64_Paypal_Back_Enum_Request_Type$: TYPE,
         }
     ) {
         // INSTANCE METHODS

@@ -15,7 +15,7 @@ export default class Fl64_Paypal_Back_Client {
             'node:@paypal/paypal-server-sdk': paypal,
             Fl64_Paypal_Back_Defaults$: DEF,
             TeqFw_Core_Back_Config$: config,
-            'Fl64_Paypal_Back_Enum_Mode.default': MODE,
+            Fl64_Paypal_Back_Enum_Mode$: MODE,
         }
     ) {
         // VARS
