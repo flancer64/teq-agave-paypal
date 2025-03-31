@@ -109,7 +109,6 @@ export default class Fl64_Paypal_Front_Ui_Page_Checkout {
                 const opts = buttons ?? BUTTONS;
                 if (!opts.createOrder) opts.createOrder = createOrder;
                 if (!opts.onApprove) opts.onApprove = onApprove;
-                debugger
                 window.paypal
                     .Buttons(opts)
                     .render(cssContainer);
