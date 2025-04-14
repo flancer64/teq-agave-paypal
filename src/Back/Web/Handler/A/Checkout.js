@@ -8,20 +8,16 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
      * @param {typeof import('node:http2')} http2
      * @param {Fl64_Paypal_Back_Defaults} DEF
      * @param {TeqFw_Web_Back_Help_Respond} respond
-     * @param {Fl64_Tmpl_Back_Service_Render} tmplRender
-     * @param {Fl64_Tmpl_Back_Api_Adapter} adapterTmpl
+     * @param {Fl64_Tmpl_Back_Service_Render_Web} srvRender
      * @param {Fl64_Paypal_Back_Client} client
-     * @param {typeof Fl64_Tmpl_Back_Enum_Type} TMPL
      */
     constructor(
         {
             'node:http2': http2,
             Fl64_Paypal_Back_Defaults$: DEF,
             TeqFw_Web_Back_Help_Respond$: respond,
-            Fl64_Tmpl_Back_Service_Render$: tmplRender,
-            Fl64_Tmpl_Back_Api_Adapter$: adapterTmpl,
+            Fl64_Tmpl_Back_Service_Render_Web$: srvRender,
             Fl64_Paypal_Back_Client$: client,
-            Fl64_Tmpl_Back_Enum_Type$: TMPL,
         }
     ) {
         // VARS
@@ -40,23 +36,16 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
          * @return {Promise<void>}
          */
         this.run = async function (req, res) {
-            // FUNCS
-
-            // MAIN
             if (req.method === HTTP2_METHOD_GET) {
-                const {localeUser, localeApp} = await adapterTmpl.getLocales({req});
-                const {content: body} = await tmplRender.perform({
-                    pkg: DEF.NAME,
-                    type: TMPL.WEB,
+                const {content: body} = await srvRender.perform({
                     name: 'checkout.html',
+                    pkg: DEF.NAME,
+                    localePkg: DEF.LOCALE,
                     view: {
                         clientId: client.getClientId(),
                     },
-                    localeUser,
-                    localeApp,
-                    localePkg: DEF.LOCALE,
+                    req,
                 });
-
                 respond.code200_Ok({
                     res, body, headers: {
                         [HTTP2_HEADER_CONTENT_TYPE]: 'text/html'
