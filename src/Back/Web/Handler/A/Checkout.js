@@ -33,7 +33,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
          * @param {module:http.IncomingMessage|module:http2.Http2ServerRequest} req - Incoming HTTP request
          * @param {module:http.ServerResponse|module:http2.Http2ServerResponse} res - HTTP response object
          *
-         * @return {Promise<void>}
+         * @return {Promise<boolean>}
          */
         this.run = async function (req, res) {
             if (req.method === HTTP2_METHOD_GET) {
@@ -51,6 +51,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Checkout {
                         [HTTP2_HEADER_CONTENT_TYPE]: 'text/html'
                     }
                 });
+                return true;
             }
 
         };

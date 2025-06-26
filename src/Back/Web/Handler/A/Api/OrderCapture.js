@@ -172,7 +172,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
          * @param {module:http.IncomingMessage|module:http2.Http2ServerRequest} req - Incoming HTTP request.
          * @param {module:http.ServerResponse|module:http2.Http2ServerResponse} res - HTTP response object.
          *
-         * @returns {Promise<void>}
+         * @returns {Promise<boolean>}
          */
         this.run = async function (req, res) {
             if (req.method === HTTP2_METHOD_POST) {
@@ -189,6 +189,7 @@ export default class Fl64_Paypal_Back_Web_Handler_A_Api_OrderCapture {
                                 [HTTP2_HEADER_CONTENT_TYPE]: 'application/json'
                             }
                         });
+                        return true;
                     }
                 }
             }
